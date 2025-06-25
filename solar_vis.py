@@ -38,7 +38,6 @@ def scale_x(x):
 
     **x** — x-координата модели.
     """
-
     return int(x*scale_factor) + window_width//2
 
 
@@ -53,8 +52,7 @@ def scale_y(y):
 
     **y** — y-координата модели.
     """
-
-    return y  # FIXME: not done yet
+    return window_height//2 - int(y*scale_factor)
 
 
 def create_star_image(space, star):
@@ -65,10 +63,9 @@ def create_star_image(space, star):
     **space** — холст для рисования.
     **star** — объект звезды.
     """
-
     x = scale_x(star.x)
     y = scale_y(star.y)
-    r = star.R
+    r = max(1, int(star.R * scale_factor))  # минимальный размер
     star.image = space.create_oval([x - r, y - r], [x + r, y + r], fill=star.color)
 
 
@@ -80,7 +77,10 @@ def create_planet_image(space, planet):
     **space** — холст для рисования.
     **planet** — объект планеты.
     """
-    pass  # FIXME: сделать как у звезды
+    x = scale_x(planet.x)
+    y = scale_y(planet.y)
+    r = max(1, int(planet.R * scale_factor))  #Минимальный размер
+    planet.image = space.create_oval([x - r, y - r], [x + r, y + r], fill=planet.color)
 
 
 def update_system_name(space, system_name):
@@ -92,7 +92,7 @@ def update_system_name(space, system_name):
     **space** — холст для рисования.
     **system_name** — название системы тел.
     """
-    space.create_text(30, 80, tag="header", text=system_name, font=header_font)
+    space.create_text(30, 30, tag="header", text=system_name, font=header_font, anchor='nw')
 
 
 def update_object_position(space, body):
@@ -105,11 +105,15 @@ def update_object_position(space, body):
     """
     x = scale_x(body.x)
     y = scale_y(body.y)
-    r = body.R
+    r = max(1, int(body.R * scale_factor))  # Гарантируем минимальный размер
+    
     if x + r < 0 or x - r > window_width or y + r < 0 or y - r > window_height:
+        # Если объект за пределами экрана:
         space.coords(body.image, window_width + r, window_height + r,
-                     window_width + 2*r, window_height + 2*r)  # положить за пределы окна
-    space.coords(body.image, x - r, y - r, x + r, y + r)
+                     window_width + 2*r, window_height + 2*r)
+    else:
+        # Обновляем позицию объекта
+        space.coords(body.image, x - r, y - r, x + r, y + r)
 
 
 if __name__ == "__main__":
