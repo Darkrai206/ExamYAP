@@ -1,7 +1,8 @@
 # coding: utf-8
 # license: GPLv3
 
-"""Модуль визуализации.
+"""
+Модуль визуализации.
 Нигде, кроме этого модуля, не используются экранные координаты объектов.
 Функции, создающие гaрафические объекты и перемещающие их на экране, принимают физические координаты
 """
@@ -9,10 +10,10 @@
 header_font = "Arial-16"
 """Шрифт в заголовке"""
 
-window_width = 800
+window_width = 1200
 """Ширина окна"""
 
-window_height = 800
+window_height = 900
 """Высота окна"""
 
 scale_factor = None
@@ -29,7 +30,8 @@ def calculate_scale_factor(max_distance):
 
 
 def scale_x(x):
-    """Возвращает экранную **x** координату по **x** координате модели.
+    """
+    Возвращает экранную **x** координату по **x** координате модели.
     Принимает вещественное число, возвращает целое число.
     В случае выхода **x** координаты за пределы экрана возвращает
     координату, лежащую за пределами холста.
@@ -42,7 +44,8 @@ def scale_x(x):
 
 
 def scale_y(y):
-    """Возвращает экранную **y** координату по **y** координате модели.
+    """
+    Возвращает экранную **y** координату по **y** координате модели.
     Принимает вещественное число, возвращает целое число.
     В случае выхода **y** координаты за пределы экрана возвращает
     координату, лежащую за пределами холста.
@@ -65,7 +68,7 @@ def create_star_image(space, star):
     """
     x = scale_x(star.x)
     y = scale_y(star.y)
-    r = max(1, int(star.R * scale_factor))  # минимальный размер
+    r = star.R
     star.image = space.create_oval([x - r, y - r], [x + r, y + r], fill=star.color)
 
 
@@ -79,7 +82,7 @@ def create_planet_image(space, planet):
     """
     x = scale_x(planet.x)
     y = scale_y(planet.y)
-    r = max(1, int(planet.R * scale_factor))  #Минимальный размер
+    r = planet.R
     planet.image = space.create_oval([x - r, y - r], [x + r, y + r], fill=planet.color)
 
 
@@ -92,7 +95,7 @@ def update_system_name(space, system_name):
     **space** — холст для рисования.
     **system_name** — название системы тел.
     """
-    space.create_text(30, 30, tag="header", text=system_name, font=header_font, anchor='nw')
+    space.create_text(30, 80, tag="header", text=system_name, font=header_font)
 
 
 def update_object_position(space, body):
@@ -105,15 +108,11 @@ def update_object_position(space, body):
     """
     x = scale_x(body.x)
     y = scale_y(body.y)
-    r = max(1, int(body.R * scale_factor))  # Гарантируем минимальный размер
-    
+    r = body.R
     if x + r < 0 or x - r > window_width or y + r < 0 or y - r > window_height:
-        # Если объект за пределами экрана:
         space.coords(body.image, window_width + r, window_height + r,
-                     window_width + 2*r, window_height + 2*r)
-    else:
-        # Обновляем позицию объекта
-        space.coords(body.image, x - r, y - r, x + r, y + r)
+                     window_width + 2*r, window_height + 2*r)  # положить за пределы окна
+    space.coords(body.image, x - r, y - r, x + r, y + r)
 
 
 if __name__ == "__main__":
